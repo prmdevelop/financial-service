@@ -23,9 +23,9 @@ public class Financial {
 	private Country country;
 	private Currency currencyReported;
 	private Source source;
+	private Period period;
 	
 	@Id
-	//@Type(type = "uuid-char")
 	@Type(type = "org.hibernate.type.UUIDCharType")
 	@Column(name = "Id")
 	public UUID getId() {
@@ -85,6 +85,15 @@ public class Financial {
 	}
 	public void setSource(Source source) {
 		this.source = source;
+	}
+	
+	@ManyToOne
+	@JoinColumn(name = "PERIOD")
+	public Period getPeriod() {
+		return period;
+	}
+	public void setPeriod(Period period) {
+		this.period = period;
 	}
 	
 	
