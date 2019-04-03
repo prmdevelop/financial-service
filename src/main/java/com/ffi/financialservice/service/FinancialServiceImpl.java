@@ -34,23 +34,28 @@ public class FinancialServiceImpl implements FinancialService {
 		Map<String, Map<String, Set<String>>> data = new HashMap<>();
 		Map<String, Set<String>> period = new HashMap<>();
 		Set<String> periodType = null;
-		List<Financial> financials = financialDao.getFinancialOfCustomer(UUID.fromString(customerId));
-		for (Financial financial : financials) {
-			if (!data.containsKey(financial.getSource().getSourceName())) {
-				period = new HashMap<>();
-				periodType = new HashSet<>();
-				periodType.add(financial.getPeriod().getPeriodType().getPeriodName());
-			} else {
-				if (!period.containsKey(financial.getPeriod().getPeriodValue())) {
+		try {
+			List<Financial> financials = financialDao.getFinancialOfCustomer(UUID.fromString(customerId));
+			for (Financial financial : financials) {
+				if (!data.containsKey(financial.getSource().getSourceName())) {
+					period = new HashMap<>();
 					periodType = new HashSet<>();
 					periodType.add(financial.getPeriod().getPeriodType().getPeriodName());
 				} else {
-					periodType = period.get(financial.getPeriod().getPeriodValue());
-					periodType.add(financial.getPeriod().getPeriodType().getPeriodName());
+					if (!period.containsKey(financial.getPeriod().getPeriodValue())) {
+						periodType = new HashSet<>();
+						periodType.add(financial.getPeriod().getPeriodType().getPeriodName());
+					} else {
+						periodType = period.get(financial.getPeriod().getPeriodValue());
+						periodType.add(financial.getPeriod().getPeriodType().getPeriodName());
+					}
 				}
+				period.put(financial.getPeriod().getPeriodValue(), periodType);
+				data.put(financial.getSource().getSourceName(), period);
 			}
-			period.put(financial.getPeriod().getPeriodValue(), periodType);
-			data.put(financial.getSource().getSourceName(), period);
+		} catch (Exception e) {
+			logger.error("Error in FinancialServiceImpl.checkDataAvailability()"+e.getCause());
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.retrieved.msg"));
 		}
 		logger.info("End of FinancialServiceImpl.checkDataAvailability()");
 		return data;
