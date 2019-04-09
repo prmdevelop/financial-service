@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +24,11 @@ import org.springframework.stereotype.Service;
 import com.ffi.financialservice.dao.FinancialDao;
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
+import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.NonCurrentAsset;
+import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
 import com.ffi.financialservice.domain.Source;
@@ -111,6 +113,12 @@ public class FinancialServiceImpl implements FinancialService {
 			List<CurrentAsset> currentAssets = financialDao.getCurrentAssetOfBalanceSheet(balanceSheet.getId());
 			List<NonCurrentAsset> nonCurrentAssets = financialDao
 					.getNonCurrentAssetOfBalanceSheet(balanceSheet.getId());
+			List<CurrentLiability> currentLiabilities = financialDao
+					.getCurrentLiabilityOfBalanceSheet(balanceSheet.getId());
+			List<NonCurrentLiability> nonCurrentLiabilities = financialDao
+					.getNonCurrentLiabilityOfBalanceSheet(balanceSheet.getId());
+			List<Equity> equities = financialDao.getEquityOfBalanceSheet(balanceSheet.getId());
+
 			for (CurrentAsset currentAsset : currentAssets) {
 				FinancialDataVO financialData = new FinancialDataVO();
 				financialData.setYear(period);
@@ -126,6 +134,30 @@ public class FinancialServiceImpl implements FinancialService {
 				financialData.setLineItemValue(nonCurrentAsset.getValue());
 				financialDataVO.add(financialData);
 			}
+
+			for (CurrentLiability currentLiabilty : currentLiabilities) {
+				FinancialDataVO financialData = new FinancialDataVO();
+				financialData.setYear(period);
+				financialData.setLineItem(currentLiabilty.getTemplateLabelId().toString());
+				financialData.setLineItemValue(currentLiabilty.getValue());
+				financialDataVO.add(financialData);
+			}
+
+			for (NonCurrentLiability currentLiability : nonCurrentLiabilities) {
+				FinancialDataVO financialData = new FinancialDataVO();
+				financialData.setYear(period);
+				financialData.setLineItem(currentLiability.getTemplateLabelId().toString());
+				financialData.setLineItemValue(currentLiability.getValue());
+				financialDataVO.add(financialData);
+			}
+
+			for (Equity equity : equities) {
+				FinancialDataVO financialData = new FinancialDataVO();
+				financialData.setYear(period);
+				financialData.setLineItem(equity.getTemplateLabelId().toString());
+				financialData.setLineItemValue(equity.getValue());
+				financialDataVO.add(financialData);
+			}
 		} catch (ApplicationBusinessException e) {
 			logger.info("Error in FinancialServiceImpl.getBalanceSheet()");
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
@@ -134,8 +166,8 @@ public class FinancialServiceImpl implements FinancialService {
 		return financialDataVO;
 	}
 
-	private List<FinancialDataVO> populateLineItemValueFromTemplate(List<FinancialDataVO> financialDataVO,
-			String templateName) throws ApplicationBusinessException {
+	private void populateLineItemValueFromTemplate(List<FinancialDataVO> financialDataVO, String templateName)
+			throws ApplicationBusinessException {
 		logger.info("Start of FinancialServiceImpl.populateLineItemValueFromTemplate()");
 		try {
 			URL url = new URL(
@@ -165,24 +197,17 @@ public class FinancialServiceImpl implements FinancialService {
 							jsonObject.getString("templateLineItem"));
 				}
 			}
-			
-			List<FinancialDataVO> dockingFinancialDataVO = financialDataVO;
-			
-			Iterator<FinancialDataVO> itr = financialDataVO.iterator();
-			while(itr.hasNext()){
-				if(templateLineItemMap.containsKey(itr.next().getLineItem())){
-					itr.next().setLineItem(templateLineItemMap.get(itr.next().getLineItem()));
+
+			for (int i = 0; i < financialDataVO.size(); i++) {
+				String lineItemId = financialDataVO.get(i).getLineItem();
+				if (templateLineItemMap.containsKey(lineItemId)) {
+					financialDataVO.get(i).setLineItem(templateLineItemMap.get(lineItemId));
 				}
-			}
-			
-			for(FinancialDataVO fv:financialDataVO){
-				System.out.println("FV ="+fv);
 			}
 		} catch (Exception e) {
 			logger.info("Error in FinancialServiceImpl.populateLineItemValueFromTemplate()" + e.getStackTrace());
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
 		}
 		logger.info("End of FinancialServiceImpl.populateLineItemValueFromTemplate()");
-		return null;
 	}
 }

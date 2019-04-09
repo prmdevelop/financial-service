@@ -56,7 +56,7 @@ public class NonCurrentLiability {
 		this.reportedLabel = reportedLabel;
 	}
 	
-	@Column(name = "TEM_LABEL_ID")
+	@Column(name = "TEMP_LABEL_ID")
 	public UUID getTemplateLabelId() {
 		return templateLabelId;
 	}

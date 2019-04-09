@@ -10,9 +10,12 @@ import org.springframework.stereotype.Component;
 
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
+import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
 import com.ffi.financialservice.domain.NonCurrentAsset;
+import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
 import com.ffi.financialservice.domain.Source;
@@ -155,5 +158,49 @@ public class FinancialDaoImpl implements FinancialDao {
 		}
 		logger.info("End of FinancialDaoImpl.getNonCurrentAssetOfBalanceSheet()");
 		return nonCurrentAssets;
+	}
+
+	@Override
+	public List<CurrentLiability> getCurrentLiabilityOfBalanceSheet(UUID balanceSheetId)
+			throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getCurrentLiabilityOfBalanceSheet()");
+		List<CurrentLiability> currentLiability = null;
+		try {
+			currentLiability = financialRepository.getCurrentLiability(balanceSheetId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getCurrentLiabilityOfBalanceSheet()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getCurrentLiabilityOfBalanceSheet()");
+		return currentLiability;
+	}
+
+	@Override
+	public List<NonCurrentLiability> getNonCurrentLiabilityOfBalanceSheet(UUID balanceSheetId)
+			throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getNonCurrentLiabilityOfBalanceSheet()");
+		List<NonCurrentLiability> nonCurrentLiability = null;
+		try {
+			nonCurrentLiability = financialRepository.getNonCurrentLiability(balanceSheetId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getNonCurrentLiabilityOfBalanceSheet()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getNonCurrentLiabilityOfBalanceSheet()");
+		return nonCurrentLiability;
+	}
+
+	@Override
+	public List<Equity> getEquityOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getEquityOfBalanceSheet()");
+		List<Equity> equity = null;
+		try {
+			equity = financialRepository.getEquity(balanceSheetId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getEquityOfBalanceSheet()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getEquityOfBalanceSheet()");
+		return equity;
 	}
 }

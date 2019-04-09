@@ -15,9 +15,9 @@ import org.hibernate.annotations.Type;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@Table(name = "CURRENT_LIABILITIES")
-public class CurrentLiability {
-
+@Table(name = "EQUITY")
+public class Equity {
+	
 	private UUID id;
 	private BalanceSheet balanceSheet;
 	private String reportedLabel;
@@ -103,4 +103,5 @@ public class CurrentLiability {
 	public void setExpired(boolean isExpired) {
 		this.isExpired = isExpired;
 	}
+
 }

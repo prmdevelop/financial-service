@@ -5,9 +5,12 @@ import java.util.UUID;
 
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
+import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
 import com.ffi.financialservice.domain.NonCurrentAsset;
+import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
 import com.ffi.financialservice.domain.Source;
@@ -32,4 +35,10 @@ public interface FinancialDao {
 	public List<CurrentAsset> getCurrentAssetOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException;
 	
 	public List<NonCurrentAsset> getNonCurrentAssetOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException;
+	
+	public List<CurrentLiability> getCurrentLiabilityOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException;
+	
+	public List<NonCurrentLiability> getNonCurrentLiabilityOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException;
+	
+	public List<Equity> getEquityOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException;
 }

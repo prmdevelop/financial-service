@@ -10,9 +10,12 @@ import org.springframework.stereotype.Repository;
 
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
+import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
 import com.ffi.financialservice.domain.NonCurrentAsset;
+import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
 import com.ffi.financialservice.domain.Source;
@@ -46,5 +49,15 @@ public interface FinancialRepository extends JpaRepository<Financial, Integer>{
 	
 	@Query("select nca from NonCurrentAsset nca INNER JOIN nca.balanceSheet bs where bs.id like :balanceSheetId")
 	List<NonCurrentAsset> getNonCurrentAssets(@Param("balanceSheetId") UUID balanceSheetId);
+	
+	@Query("select cl from CurrentLiability cl INNER JOIN cl.balanceSheet bs where bs.id like :balanceSheetId")
+	List<CurrentLiability> getCurrentLiability(@Param("balanceSheetId") UUID balanceSheetId);
+	
+	
+	@Query("select ncl from NonCurrentLiability ncl INNER JOIN ncl.balanceSheet bs where bs.id like :balanceSheetId")
+	List<NonCurrentLiability> getNonCurrentLiability(@Param("balanceSheetId") UUID balanceSheetId);
+	
+	@Query("select eq from Equity eq INNER JOIN eq.balanceSheet bs where bs.id like :balanceSheetId")
+	List<Equity> getEquity(@Param("balanceSheetId") UUID balanceSheetId);
 
 }
