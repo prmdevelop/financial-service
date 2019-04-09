@@ -9,19 +9,42 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ffi.financialservice.domain.BalanceSheet;
+import com.ffi.financialservice.domain.CurrentAsset;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
+import com.ffi.financialservice.domain.NonCurrentAsset;
+import com.ffi.financialservice.domain.Period;
+import com.ffi.financialservice.domain.PeriodType;
+import com.ffi.financialservice.domain.Source;
 
 @Repository
 public interface FinancialRepository extends JpaRepository<Financial, Integer>{
 	
-	@Query(value = "select f from Financial f where f.customerId like :filter")
-	List<Financial> getFinancialOfCustomer(@Param("filter") UUID filter);
+	@Query("select f from Financial f where f.customerId like :customerId")
+	List<Financial> getFinancialOfCustomer(@Param("customerId") UUID customerId);
 	
-	@Query(value = "select b from BalanceSheet b where b.financialId like :filter")
-	List<BalanceSheet> getBalanceSheetOfFinancial(@Param("filter") UUID filter);
+	@Query("select bs from BalanceSheet bs INNER JOIN bs.financial f where f.id like :financialId")
+	BalanceSheet getBalanceSheetOfFinancial(@Param("financialId") UUID financialId);
 	
-	@Query(value = "select i from IncomeStatement i where i.financialId like :filter")
-	List<IncomeStatement> getIncomeStatementOfFinancial(@Param("filter") UUID filter);
+	@Query("select ist from IncomeStatement ist INNER JOIN ist.financial f where f.id like :financialId")
+	IncomeStatement getIncomeStatementOfFinancial(@Param("financialId") UUID financialId);
+	
+	@Query("select pt from PeriodType pt where pt.periodName like :periodType")
+	PeriodType getPeriodType(@Param("periodType") String periodType);
+	
+	@Query("select p from Period p INNER JOIN p.periodType pt where pt.id like :periodTypeId AND p.periodValue like :period")
+	Period getPeriod(@Param("periodTypeId") UUID periodTypeId,@Param("period") String period);
+	
+	@Query("select s from Source s where s.sourceName like :sourceName")
+	Source getSource(@Param("sourceName") String sourceName);
+	
+	@Query("select fd from Financial fd INNER JOIN fd.source fsrc INNER JOIN fd.period fdp where fsrc.id like :sourceId AND fdp.id like :periodId AND fd.customerId like :customerId")
+	Financial getFinancial(@Param("sourceId") UUID sourceId,@Param("periodId") UUID periodId,@Param("customerId") UUID customerId);
+	
+	@Query("select ca from CurrentAsset ca INNER JOIN ca.balanceSheet bs where bs.id like :balanceSheetId")
+	List<CurrentAsset> getCurrentAssets(@Param("balanceSheetId") UUID balanceSheetId);
+	
+	@Query("select nca from NonCurrentAsset nca INNER JOIN nca.balanceSheet bs where bs.id like :balanceSheetId")
+	List<NonCurrentAsset> getNonCurrentAssets(@Param("balanceSheetId") UUID balanceSheetId);
 
 }

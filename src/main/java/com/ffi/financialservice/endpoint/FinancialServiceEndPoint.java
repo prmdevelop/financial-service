@@ -1,5 +1,6 @@
 package com.ffi.financialservice.endpoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +11,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ffi.financialservice.handler.AppProperities;
 import com.ffi.financialservice.service.FinancialService;
+import com.ffi.financialservice.vo.FinancialDataVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +48,7 @@ public class FinancialServiceEndPoint {
 		try {
 			FinancialServiceResponseObject responseObject = new FinancialServiceResponseObject();
 			Map<String, Object> data = new HashMap<>();
-			Map<String, Map<String,Set<String>>> financialSource = financialService.checkDataAvailability(companyId);
+			Map<String, Map<String, Set<String>>> financialSource = financialService.checkDataAvailability(companyId);
 			data.put("data available", financialSource);
 			responseObject.setFinancialServiceResponse(data);
 			responseJson.setStatusMessage(appProperities.getPropertyValue("success.retrieved.msg"));
@@ -59,4 +64,30 @@ public class FinancialServiceEndPoint {
 		return responseJson;
 	}
 
+	@ApiOperation(value = "Get Financial Data")
+	@PostMapping(value = "/getFinancialData",consumes="application/json" ,produces = "application/json")
+	@ResponseBody
+	public FinancialServiceResponseJson<FinancialServiceResponseObject> getFinancialData(@RequestBody
+			FinancialServiceRequestJson fRequestJson) {
+		logger.info("Start of FinancialServiceEndPoint.getFinancialData()");
+		FinancialServiceResponseJson<FinancialServiceResponseObject> responseJson = new FinancialServiceResponseJson<>();
+		try {
+			FinancialServiceResponseObject responseObject = new FinancialServiceResponseObject();
+			Map<String, Object> data = new HashMap<>();
+			List<FinancialDataVO> financialData = financialService.getFinancialData(fRequestJson.getTemplateName(),fRequestJson.getCompanyId(),
+										fRequestJson.getSourceName(),fRequestJson.getPeriodRequest());
+			data.put("financial data", financialData);
+			responseObject.setFinancialServiceResponse(data);
+			responseJson.setStatusMessage(appProperities.getPropertyValue("success.retrieved.msg"));
+			responseJson.setStatusMessage(appProperities.getPropertyValue("success.retrieved.msg"));
+			responseJson.setStatusCode(appProperities.getPropertyValue("success.code"));
+			responseJson.setData(responseObject);
+		} catch (Exception e) {
+			logger.error("Exception in FinancialServiceEndPoint.getFinancialData()");
+			responseJson.setErrorMessage(appProperities.getPropertyValue("error.retrieved.msg"));
+			responseJson.setErrorCode(appProperities.getPropertyValue("error.code"));
+		}
+		logger.info("End of FinancialServiceEndPoint.getFinancialData()");
+		return responseJson;
+	}
 }

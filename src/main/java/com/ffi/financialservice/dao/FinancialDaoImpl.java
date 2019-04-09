@@ -9,20 +9,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ffi.financialservice.domain.BalanceSheet;
+import com.ffi.financialservice.domain.CurrentAsset;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
+import com.ffi.financialservice.domain.NonCurrentAsset;
+import com.ffi.financialservice.domain.Period;
+import com.ffi.financialservice.domain.PeriodType;
+import com.ffi.financialservice.domain.Source;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 import com.ffi.financialservice.handler.AppProperities;
 import com.ffi.financialservice.repository.FinancialRepository;
 
 @Component
-public class FinancialDaoImpl implements FinancialDao{
-	
+public class FinancialDaoImpl implements FinancialDao {
+
 	private static final Logger logger = LogManager.getLogger(FinancialDaoImpl.class);
-	
+
 	@Autowired
 	FinancialRepository financialRepository;
-	
+
 	@Autowired
 	AppProperities appProperities;
 
@@ -41,31 +46,114 @@ public class FinancialDaoImpl implements FinancialDao{
 	}
 
 	@Override
-	public List<BalanceSheet> getBalanceSheetOfFinancial(UUID financialId)throws ApplicationBusinessException {
+	public BalanceSheet getBalanceSheetOfFinancial(UUID financialId) throws ApplicationBusinessException {
 		logger.info("Start of FinancialDaoImpl.getBalanceSheetOfFinancial()");
-		List<BalanceSheet> balanceSheets = null;
+		BalanceSheet balanceSheet = null;
 		try {
-			balanceSheets = financialRepository.getBalanceSheetOfFinancial(financialId);
+			balanceSheet = financialRepository.getBalanceSheetOfFinancial(financialId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getBalanceSheetOfFinancial()");
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
 		}
 		logger.info("End of FinancialDaoImpl.getBalanceSheetOfFinancial()");
-		return balanceSheets;
+		return balanceSheet;
 	}
 
 	@Override
-	public List<IncomeStatement> getIncomeStatementOfFinancial(UUID financialId) throws ApplicationBusinessException {
+	public IncomeStatement getIncomeStatementOfFinancial(UUID financialId) throws ApplicationBusinessException {
 		logger.info("Start of FinancialDaoImpl.getIncomeStatementOfFinancial()");
-		List<IncomeStatement> incomeStatements = null;
+		IncomeStatement incomeStatement = null;
 		try {
-			incomeStatements = financialRepository.getIncomeStatementOfFinancial(financialId);
+			incomeStatement = financialRepository.getIncomeStatementOfFinancial(financialId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getIncomeStatementOfFinancial()");
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
 		}
 		logger.info("End of FinancialDaoImpl.getIncomeStatementOfFinancial()");
-		return incomeStatements;
+		return incomeStatement;
 	}
 
+	@Override
+	public PeriodType getPeriodType(String periodTypeName) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getPeriodType()");
+		PeriodType periodType = null;
+		try {
+			periodType = financialRepository.getPeriodType(periodTypeName);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getPeriodType()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getPeriodType()");
+		return periodType;
+	}
+
+	@Override
+	public Period getPeriod(UUID periodTypeID, String periodValue) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getPeriod()");
+		Period period = null;
+		try {
+			period = financialRepository.getPeriod(periodTypeID, periodValue);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getPeriod()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getPeriod()");
+		return period;
+	}
+
+	@Override
+	public Source getSource(String sourceName) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getSource()");
+		Source source = null;
+		try {
+			source = financialRepository.getSource(sourceName);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getSource()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getSource()");
+		return source;
+	}
+
+	@Override
+	public Financial getFinancial(UUID sourceId, UUID periodId,UUID companyId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getFinancial()");
+		Financial financial = null;
+		try {
+			financial = financialRepository.getFinancial(sourceId, periodId,companyId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getFinancial()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getFinancial()");
+		return financial;
+	}
+	
+	@Override
+	public List<CurrentAsset> getCurrentAssetOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getCurrentAssetOfBalanceSheet()");
+		List<CurrentAsset> currentAssets = null;
+		try {
+			currentAssets = financialRepository.getCurrentAssets(balanceSheetId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getCurrentAssetOfBalanceSheet()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getCurrentAssetOfBalanceSheet()");
+		return currentAssets;
+	}
+	
+	@Override
+	public List<NonCurrentAsset> getNonCurrentAssetOfBalanceSheet(UUID balanceSheetId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getNonCurrentAssetOfBalanceSheet()");
+		List<NonCurrentAsset> nonCurrentAssets = null;
+		try {
+			nonCurrentAssets = financialRepository.getNonCurrentAssets(balanceSheetId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getNonCurrentAssetOfBalanceSheet()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getNonCurrentAssetOfBalanceSheet()");
+		return nonCurrentAssets;
+	}
 }

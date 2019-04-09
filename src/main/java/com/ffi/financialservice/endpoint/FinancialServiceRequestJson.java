@@ -1,20 +1,53 @@
 package com.ffi.financialservice.endpoint;
 
+import java.util.List;
+
 public class FinancialServiceRequestJson {
 
-	private String data;
+	private String templateName;
 
-	public String getData() {
-		return data;
+	private String companyId;
+
+	private String sourceName;
+
+	private List<PeriodRequest> periodRequest;
+
+	public String getTemplateName() {
+		return templateName;
 	}
 
-	public void setData(String data) {
-		this.data = data;
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
+	public String getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(String companyId) {
+		this.companyId = companyId;
+	}
+
+	public String getSourceName() {
+		return sourceName;
+	}
+
+	public void setSourceName(String sourceName) {
+		this.sourceName = sourceName;
+	}
+
+	public List<PeriodRequest> getPeriodRequest() {
+		return periodRequest;
+	}
+
+	public void setPeriodRequest(List<PeriodRequest> periodRequest) {
+		this.periodRequest = periodRequest;
 	}
 
 	@Override
 	public String toString() {
-		return "FinancialServiceRequestJson [data=" + data + "]";
+		return "FinancialServiceRequestJson [templateName=" + templateName + ", companyId=" + companyId + ", sourceName="
+				+ sourceName + ", periodRequest=" + periodRequest + "]";
 	}
-	
+
 }

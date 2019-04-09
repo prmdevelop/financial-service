@@ -12,19 +12,22 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "INCOME_STATEMENT")
 public class IncomeStatement {
 	
 	private UUID id;
-	private UUID financialId;
-	private String year;
-	private Date endDate;
-	private String auditStatus;
-	private String version;
-	private String grossProfit;
-	private Currency currencyReported;
-	private Currency currencyConverted;
+	private Financial financial;
+	private Date periodEndDate;
+	private boolean auditStatus;
+	private int version;
+	private Double grossProfit;
+	private Double netSales;
+	private Double opertingINcome;
+	private Double profitBeforeTax;
+	private Double netPrfoit;
 	
 	@Id
 	@Type(type = "uuid-char")
@@ -36,71 +39,77 @@ public class IncomeStatement {
 		this.id = id;
 	}
 	
-	@Type(type = "org.hibernate.type.UUIDCharType")
-	@Column(name = "FINANCIAL_ID")
-	public UUID getFinancialId() {
-		return financialId;
+	@JsonBackReference
+	@ManyToOne
+	@JoinColumn(name = "FINANCIAL_ID")
+	public Financial getFinancial() {
+		return financial;
 	}
-	public void setFinancialId(UUID financialId) {
-		this.financialId = financialId;
-	}
-	
-	@Column(name = "YEAR")
-	public String getYear() {
-		return year;
-	}
-	public void setYear(String year) {
-		this.year = year;
+	public void setFinancial(Financial financial) {
+		this.financial = financial;
 	}
 	
 	@Column(name = "PERIOD_END_DATE")
-	public Date getEndDate() {
-		return endDate;
+	public Date getPeriodEndDate() {
+		return periodEndDate;
 	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setPeriodEndDate(Date periodEndDate) {
+		this.periodEndDate = periodEndDate;
 	}
 	
 	@Column(name = "AUDIT_STATUS")
-	public String getAuditStatus() {
+	public boolean isAuditStatus() {
 		return auditStatus;
 	}
-	public void setAuditStatus(String auditStatus) {
+	public void setAuditStatus(boolean auditStatus) {
 		this.auditStatus = auditStatus;
 	}
 	
 	@Column(name = "VERSION")
-	public String getVersion() {
+	public int getVersion() {
 		return version;
 	}
-	public void setVersion(String version) {
+	public void setVersion(int version) {
 		this.version = version;
 	}
 	
 	@Column(name = "GROSS_PROFIT")
-	public String getGrossProfit() {
+	public Double getGrossProfit() {
 		return grossProfit;
 	}
-	public void setGrossProfit(String grossProfit) {
+	public void setGrossProfit(Double grossProfit) {
 		this.grossProfit = grossProfit;
 	}
 	
-	@ManyToOne
-	@JoinColumn(name = "CURRENCY_REPORTED")
-	public Currency getCurrencyReported() {
-		return currencyReported;
+	@Column(name = "NET_SALES")
+	public Double getNetSales() {
+		return netSales;
 	}
-	public void setCurrencyReported(Currency currencyReported) {
-		this.currencyReported = currencyReported;
+	public void setNetSales(Double netSales) {
+		this.netSales = netSales;
 	}
 	
-	@ManyToOne
-	@JoinColumn(name = "CURRENCY_CONVERTED")
-	public Currency getCurrencyConverted() {
-		return currencyConverted;
+	@Column(name = "OPERTING_INCOME")
+	public Double getOpertingINcome() {
+		return opertingINcome;
 	}
-	public void setCurrencyConverted(Currency currencyConverted) {
-		this.currencyConverted = currencyConverted;
+	public void setOpertingINcome(Double opertingINcome) {
+		this.opertingINcome = opertingINcome;
 	}
-
+	
+	@Column(name = "PROFIT_BEFORE_TAX")
+	public Double getProfitBeforeTax() {
+		return profitBeforeTax;
+	}
+	public void setProfitBeforeTax(Double profitBeforeTax) {
+		this.profitBeforeTax = profitBeforeTax;
+	}
+	
+	@Column(name = "NET_PROFIT")
+	public Double getNetPrfoit() {
+		return netPrfoit;
+	}
+	public void setNetPrfoit(Double netPrfoit) {
+		this.netPrfoit = netPrfoit;
+	}
 }

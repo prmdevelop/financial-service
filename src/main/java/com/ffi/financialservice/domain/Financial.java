@@ -1,16 +1,21 @@
 package com.ffi.financialservice.domain;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "FINANCIAL_MASTER")
@@ -24,6 +29,8 @@ public class Financial {
 	private Currency currencyReported;
 	private Source source;
 	private Period period;
+	private Set<BalanceSheet> balanceSheets;
+	private Set<IncomeStatement> incomeStatements;	
 	
 	@Id
 	@Type(type = "org.hibernate.type.UUIDCharType")
@@ -96,6 +103,22 @@ public class Financial {
 		this.period = period;
 	}
 	
+	@JsonManagedReference
+	@OneToMany(mappedBy = "financial", cascade = CascadeType.ALL)
+	public Set<BalanceSheet> getBalanceSheets() {
+		return balanceSheets;
+	}
+	public void setBalanceSheets(Set<BalanceSheet> balanceSheets) {
+		this.balanceSheets = balanceSheets;
+	}
 	
+	@JsonManagedReference
+	@OneToMany(mappedBy = "financial", cascade = CascadeType.ALL)
+	public Set<IncomeStatement> getIncomeStatements() {
+		return incomeStatements;
+	}
+	public void setIncomeStatements(Set<IncomeStatement> incomeStatements) {
+		this.incomeStatements = incomeStatements;
+	}
 
 }
