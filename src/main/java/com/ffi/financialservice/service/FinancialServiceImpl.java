@@ -2,11 +2,11 @@ package com.ffi.financialservice.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +35,7 @@ import com.ffi.financialservice.domain.Source;
 import com.ffi.financialservice.endpoint.PeriodRequest;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 import com.ffi.financialservice.handler.AppProperities;
-import com.ffi.financialservice.vo.FinancialDataVO;
+import com.ffi.financialservice.handler.FinancialDTO;
 
 @Service
 public class FinancialServiceImpl implements FinancialService {
@@ -82,10 +82,12 @@ public class FinancialServiceImpl implements FinancialService {
 	}
 
 	@Override
-	public List<FinancialDataVO> getFinancialData(String templateName, String companyId, String sourceName,
+	public String getFinancialData(String templateName, String companyId, String sourceName,
 			List<PeriodRequest> periodRequest) throws ApplicationBusinessException {
 		logger.info("Start of FinancialServiceImpl.getFinancialData()");
-		List<FinancialDataVO> financialDataVO = new ArrayList<>();
+		String templateURL = "";
+		List<FinancialDTO> financialDTOList = new ArrayList<>();
+		Map<String, Map<String, Double>> financialData = new HashMap<>();
 		try {
 			Source source = financialDao.getSource(sourceName);
 			for (PeriodRequest pRequest : periodRequest) {
@@ -93,21 +95,32 @@ public class FinancialServiceImpl implements FinancialService {
 				Period period = financialDao.getPeriod(periodType.getId(), pRequest.getPeriod());
 				Financial financial = financialDao.getFinancial(source.getId(), period.getId(),
 						UUID.fromString(companyId));
-				financialDataVO.addAll(getBalanceSheet(financial.getId(), period.getPeriodValue()));
+				financialDTOList.addAll(getBalanceSheet(financial.getId(), period.getPeriodValue()));
 			}
-			populateLineItemValueFromTemplate(financialDataVO, templateName);
-			Collections.sort(financialDataVO, Collections.reverseOrder());
+			populateLineItemValueFromTemplate(financialDTOList, templateName);
+			for (int i = 0; i < financialDTOList.size(); i++) {
+				Map<String, Double> lineItemValue;
+				if (financialData.containsKey(financialDTOList.get(i).getLineItem())) {
+					lineItemValue = financialData.get(financialDTOList.get(i).getLineItem());
+					lineItemValue.put(financialDTOList.get(i).getYear(), financialDTOList.get(i).getLineItemValue());
+				} else {
+					lineItemValue = new HashMap<>();
+					lineItemValue.put(financialDTOList.get(i).getYear(), financialDTOList.get(i).getLineItemValue());
+				}
+				financialData.put(financialDTOList.get(i).getLineItem(), lineItemValue);
+			}
+			templateURL = uploadDataToTemplate(templateName, financialData);
 		} catch (Exception e) {
 			logger.info("Error in FinancialServiceImpl.getFinancialData()" + e.getStackTrace());
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
 		}
 		logger.info("End of FinancialServiceImpl.getFinancialData()");
-		return financialDataVO;
+		return templateURL;
 	}
 
-	private List<FinancialDataVO> getBalanceSheet(UUID financialId, String period) throws ApplicationBusinessException {
+	private List<FinancialDTO> getBalanceSheet(UUID financialId, String period) throws ApplicationBusinessException {
 		logger.info("Start of FinancialServiceImpl.getBalanceSheet()");
-		List<FinancialDataVO> financialDataVO = new ArrayList<>();
+		List<FinancialDTO> financialDataList = new ArrayList<>();
 		try {
 			BalanceSheet balanceSheet = financialDao.getBalanceSheetOfFinancial(financialId);
 			List<CurrentAsset> currentAssets = financialDao.getCurrentAssetOfBalanceSheet(balanceSheet.getId());
@@ -120,53 +133,53 @@ public class FinancialServiceImpl implements FinancialService {
 			List<Equity> equities = financialDao.getEquityOfBalanceSheet(balanceSheet.getId());
 
 			for (CurrentAsset currentAsset : currentAssets) {
-				FinancialDataVO financialData = new FinancialDataVO();
-				financialData.setYear(period);
-				financialData.setLineItem(currentAsset.getTemplateLabelId().toString());
-				financialData.setLineItemValue(currentAsset.getValue());
-				financialDataVO.add(financialData);
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(currentAsset.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(currentAsset.getValue());
+				financialDataList.add(financialDto);
 			}
 
 			for (NonCurrentAsset nonCurrentAsset : nonCurrentAssets) {
-				FinancialDataVO financialData = new FinancialDataVO();
-				financialData.setYear(period);
-				financialData.setLineItem(nonCurrentAsset.getTemplateLabelId().toString());
-				financialData.setLineItemValue(nonCurrentAsset.getValue());
-				financialDataVO.add(financialData);
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(nonCurrentAsset.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(nonCurrentAsset.getValue());
+				financialDataList.add(financialDto);
 			}
 
 			for (CurrentLiability currentLiabilty : currentLiabilities) {
-				FinancialDataVO financialData = new FinancialDataVO();
-				financialData.setYear(period);
-				financialData.setLineItem(currentLiabilty.getTemplateLabelId().toString());
-				financialData.setLineItemValue(currentLiabilty.getValue());
-				financialDataVO.add(financialData);
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(currentLiabilty.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(currentLiabilty.getValue());
+				financialDataList.add(financialDto);
 			}
 
 			for (NonCurrentLiability currentLiability : nonCurrentLiabilities) {
-				FinancialDataVO financialData = new FinancialDataVO();
-				financialData.setYear(period);
-				financialData.setLineItem(currentLiability.getTemplateLabelId().toString());
-				financialData.setLineItemValue(currentLiability.getValue());
-				financialDataVO.add(financialData);
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(currentLiability.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(currentLiability.getValue());
+				financialDataList.add(financialDto);
 			}
 
 			for (Equity equity : equities) {
-				FinancialDataVO financialData = new FinancialDataVO();
-				financialData.setYear(period);
-				financialData.setLineItem(equity.getTemplateLabelId().toString());
-				financialData.setLineItemValue(equity.getValue());
-				financialDataVO.add(financialData);
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(equity.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(equity.getValue());
+				financialDataList.add(financialDto);
 			}
 		} catch (ApplicationBusinessException e) {
 			logger.info("Error in FinancialServiceImpl.getBalanceSheet()");
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
 		}
 		logger.info("End of FinancialServiceImpl.getBalanceSheet()");
-		return financialDataVO;
+		return financialDataList;
 	}
 
-	private void populateLineItemValueFromTemplate(List<FinancialDataVO> financialDataVO, String templateName)
+	private void populateLineItemValueFromTemplate(List<FinancialDTO> financialDataList, String templateName)
 			throws ApplicationBusinessException {
 		logger.info("Start of FinancialServiceImpl.populateLineItemValueFromTemplate()");
 		try {
@@ -198,10 +211,10 @@ public class FinancialServiceImpl implements FinancialService {
 				}
 			}
 
-			for (int i = 0; i < financialDataVO.size(); i++) {
-				String lineItemId = financialDataVO.get(i).getLineItem();
+			for (int i = 0; i < financialDataList.size(); i++) {
+				String lineItemId = financialDataList.get(i).getLineItem();
 				if (templateLineItemMap.containsKey(lineItemId)) {
-					financialDataVO.get(i).setLineItem(templateLineItemMap.get(lineItemId));
+					financialDataList.get(i).setLineItem(templateLineItemMap.get(lineItemId));
 				}
 			}
 		} catch (Exception e) {
@@ -209,5 +222,46 @@ public class FinancialServiceImpl implements FinancialService {
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
 		}
 		logger.info("End of FinancialServiceImpl.populateLineItemValueFromTemplate()");
+	}
+
+	private String uploadDataToTemplate(String templateName, Map<String, Map<String, Double>> financialData)
+			throws ApplicationBusinessException {
+		logger.info("Start of FinancialServiceImpl.uploadDataToTemplate()");
+		String webUrl = "";
+		try {
+			URL url = new URL(appProperities.getPropertyValue("template.upload.rest.url"));
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setRequestProperty("Content-Type", "application/json");
+			conn.setRequestProperty("Accept", "application/json");
+			conn.setRequestMethod("POST");
+			JSONObject requestJson = new JSONObject();
+			requestJson.put("templateName", templateName);
+			requestJson.put("data", financialData);
+			byte[] data = requestJson.toString().getBytes("UTF-8");
+			OutputStream outStream = conn.getOutputStream();
+			outStream.write(data);
+			outStream.flush();
+			outStream.close();
+			if (conn.getResponseCode() != 200) {
+				throw new ApplicationBusinessException("Failed : HTTP error code : " + conn.getResponseCode());
+			}
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+			StringBuilder sb = new StringBuilder();
+			String inputLine = "";
+			while ((inputLine = br.readLine()) != null) {
+				sb.append(inputLine);
+			}
+			br.close();
+			conn.disconnect();
+			JSONObject jsonObject = new JSONObject(sb.toString()).getJSONObject("data").getJSONObject("templateResponse");
+			webUrl = jsonObject.getString("url");
+		} catch (Exception e) {
+			logger.info("Error in FinancialServiceImpl.uploadDataToTemplate()" + e.getStackTrace());
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
+		}
+		logger.info("End of FinancialServiceImpl.uploadDataToTemplate()");
+		return webUrl;
 	}
 }

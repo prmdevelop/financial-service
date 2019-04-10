@@ -1,8 +1,6 @@
 package com.ffi.financialservice.endpoint;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ffi.financialservice.handler.AppProperities;
 import com.ffi.financialservice.service.FinancialService;
-import com.ffi.financialservice.vo.FinancialDataVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,18 +61,18 @@ public class FinancialServiceEndPoint {
 	}
 
 	@ApiOperation(value = "Get Financial Data")
-	@PostMapping(value = "/getFinancialData",consumes="application/json" ,produces = "application/json")
+	@PostMapping(value = "/getFinancialData", consumes = "application/json", produces = "application/json")
 	@ResponseBody
-	public FinancialServiceResponseJson<FinancialServiceResponseObject> getFinancialData(@RequestBody
-			FinancialServiceRequestJson fRequestJson) {
+	public FinancialServiceResponseJson<FinancialServiceResponseObject> getFinancialData(
+			@RequestBody FinancialServiceRequestJson fRequestJson) {
 		logger.info("Start of FinancialServiceEndPoint.getFinancialData()");
 		FinancialServiceResponseJson<FinancialServiceResponseObject> responseJson = new FinancialServiceResponseJson<>();
 		try {
 			FinancialServiceResponseObject responseObject = new FinancialServiceResponseObject();
 			Map<String, Object> data = new HashMap<>();
-			List<FinancialDataVO> financialData = financialService.getFinancialData(fRequestJson.getTemplateName(),fRequestJson.getCompanyId(),
-										fRequestJson.getSourceName(),fRequestJson.getPeriodRequest());
-			data.put("financial data", financialData);
+			String templateURL = financialService.getFinancialData(fRequestJson.getTemplateName(),
+					fRequestJson.getCompanyId(), fRequestJson.getSourceName(), fRequestJson.getPeriodRequest());
+			data.put("templateURL", templateURL);
 			responseObject.setFinancialServiceResponse(data);
 			responseJson.setStatusMessage(appProperities.getPropertyValue("success.retrieved.msg"));
 			responseJson.setStatusMessage(appProperities.getPropertyValue("success.retrieved.msg"));
