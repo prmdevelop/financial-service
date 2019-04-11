@@ -2,6 +2,8 @@ package com.ffi.financialservice.endpoint;
 
 import java.util.List;
 
+import com.ffi.financialservice.dto.PeriodRequest;
+
 public class FinancialServiceRequestJson {
 
 	private String templateName;

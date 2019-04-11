@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ffi.financialservice.endpoint.PeriodRequest;
+import com.ffi.financialservice.dto.PeriodRequest;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 
 public interface FinancialService {

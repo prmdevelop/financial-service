@@ -1,4 +1,4 @@
-package com.ffi.financialservice.endpoint;
+package com.ffi.financialservice.dto;
 
 public class PeriodRequest {
 	

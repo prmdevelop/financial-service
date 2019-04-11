@@ -38,7 +38,7 @@ import com.ffi.financialservice.domain.Revenue;
 import com.ffi.financialservice.domain.Source;
 import com.ffi.financialservice.domain.Tax;
 import com.ffi.financialservice.dto.FinancialDTO;
-import com.ffi.financialservice.endpoint.PeriodRequest;
+import com.ffi.financialservice.dto.PeriodRequest;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 import com.ffi.financialservice.handler.AppProperities;
 
@@ -123,45 +123,55 @@ public class FinancialServiceImpl implements FinancialService {
 			List<NonCurrentLiability> nonCurrentLiabilities = financialDao
 					.getNonCurrentLiabilityOfBalanceSheet(balanceSheet.getId());
 			List<Equity> equities = financialDao.getEquityOfBalanceSheet(balanceSheet.getId());
-
-			for (CurrentAsset currentAsset : currentAssets) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(currentAsset.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(currentAsset.getValue());
-				financialDataList.add(financialDto);
+			
+			if (!currentAssets.isEmpty()) {
+				for (CurrentAsset currentAsset : currentAssets) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(currentAsset.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(currentAsset.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (NonCurrentAsset nonCurrentAsset : nonCurrentAssets) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(nonCurrentAsset.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(nonCurrentAsset.getValue());
-				financialDataList.add(financialDto);
+			if (!nonCurrentAssets.isEmpty()) {
+				for (NonCurrentAsset nonCurrentAsset : nonCurrentAssets) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(nonCurrentAsset.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(nonCurrentAsset.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (CurrentLiability currentLiabilty : currentLiabilities) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(currentLiabilty.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(currentLiabilty.getValue());
-				financialDataList.add(financialDto);
+			if (!currentLiabilities.isEmpty()) {
+				for (CurrentLiability currentLiabilty : currentLiabilities) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(currentLiabilty.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(currentLiabilty.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (NonCurrentLiability currentLiability : nonCurrentLiabilities) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(currentLiability.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(currentLiability.getValue());
-				financialDataList.add(financialDto);
+			if (!nonCurrentLiabilities.isEmpty()) {
+				for (NonCurrentLiability currentLiability : nonCurrentLiabilities) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(currentLiability.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(currentLiability.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (Equity equity : equities) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(equity.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(equity.getValue());
-				financialDataList.add(financialDto);
+			if (!equities.isEmpty()) {
+				for (Equity equity : equities) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(equity.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(equity.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 		} catch (ApplicationBusinessException e) {
 			logger.info("Error in FinancialServiceImpl.getBalanceSheet()");
@@ -182,44 +192,54 @@ public class FinancialServiceImpl implements FinancialService {
 			List<DebtFin> debtFins = financialDao.getDebtFinOfIncomeStatement(incomeStatement.getId());
 			List<Tax> taxes = financialDao.getTaxOfIncomeStatement(incomeStatement.getId());
 
-			for (Revenue revenue : revenues) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(revenue.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(revenue.getValue());
-				financialDataList.add(financialDto);
+			if (!revenues.isEmpty()) {
+				for (Revenue revenue : revenues) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(revenue.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(revenue.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (DirectCost directCost : directCosts) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(directCost.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(directCost.getValue());
-				financialDataList.add(financialDto);
+			if (!directCosts.isEmpty()) {
+				for (DirectCost directCost : directCosts) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(directCost.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(directCost.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (IndirectCost indirectCost : indirectCosts) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(indirectCost.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(indirectCost.getValue());
-				financialDataList.add(financialDto);
+			if (!indirectCosts.isEmpty()) {
+				for (IndirectCost indirectCost : indirectCosts) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(indirectCost.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(indirectCost.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (DebtFin debtFin : debtFins) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(debtFin.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(debtFin.getValue());
-				financialDataList.add(financialDto);
+			if (!debtFins.isEmpty()) {
+				for (DebtFin debtFin : debtFins) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(debtFin.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(debtFin.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 
-			for (Tax tax : taxes) {
-				FinancialDTO financialDto = new FinancialDTO();
-				financialDto.setYear(period);
-				financialDto.setLineItem(tax.getTemplateLabelId().toString());
-				financialDto.setLineItemValue(tax.getValue());
-				financialDataList.add(financialDto);
+			if (!taxes.isEmpty()) {
+				for (Tax tax : taxes) {
+					FinancialDTO financialDto = new FinancialDTO();
+					financialDto.setYear(period);
+					financialDto.setLineItem(tax.getTemplateLabelId().toString());
+					financialDto.setLineItemValue(tax.getValue());
+					financialDataList.add(financialDto);
+				}
 			}
 		} catch (ApplicationBusinessException e) {
 			logger.info("Error in FinancialServiceImpl.getIncomeStatement()");
