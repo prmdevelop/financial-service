@@ -11,14 +11,19 @@ import org.springframework.stereotype.Component;
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
 import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.DebtFin;
+import com.ffi.financialservice.domain.DirectCost;
 import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
+import com.ffi.financialservice.domain.IndirectCost;
 import com.ffi.financialservice.domain.NonCurrentAsset;
 import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
+import com.ffi.financialservice.domain.Revenue;
 import com.ffi.financialservice.domain.Source;
+import com.ffi.financialservice.domain.Tax;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 import com.ffi.financialservice.handler.AppProperities;
 import com.ffi.financialservice.repository.FinancialRepository;
@@ -202,5 +207,76 @@ public class FinancialDaoImpl implements FinancialDao {
 		}
 		logger.info("End of FinancialDaoImpl.getEquityOfBalanceSheet()");
 		return equity;
+	}
+
+	@Override
+	public List<Revenue> getRevenueOfIncomeStatement(UUID incomeStatementId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getRevenueOfIncomeStatement()");
+		List<Revenue> revenues = null;
+		try {
+			revenues = financialRepository.getRevenues(incomeStatementId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getRevenueOfIncomeStatement()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getRevenueOfIncomeStatement()");
+		return revenues;
+	}
+
+	@Override
+	public List<DirectCost> getDirectCostOfIncomeStatement(UUID incomeStatementId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getDirectCostOfIncomeStatement()");
+		List<DirectCost> directCosts = null;
+		try {
+			directCosts = financialRepository.getDirectCosts(incomeStatementId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getDirectCostOfIncomeStatement()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getDirectCostOfIncomeStatement()");
+		return directCosts;
+	}
+
+	@Override
+	public List<IndirectCost> getIndirectCostOfIncomeStatement(UUID incomeStatementId)
+			throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getIndirectCostOfIncomeStatement()");
+		List<IndirectCost> indirectCosts = null;
+		try {
+			indirectCosts = financialRepository.getIndirectCosts(incomeStatementId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getIndirectCostOfIncomeStatement()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getIndirectCostOfIncomeStatement()");
+		return indirectCosts;
+	}
+
+	@Override
+	public List<DebtFin> getDebtFinOfIncomeStatement(UUID incomeStatementId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getDebtFinOfIncomeStatement()");
+		List<DebtFin> debtFins = null;
+		try {
+			debtFins = financialRepository.getDebtFins(incomeStatementId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getDebtFinOfIncomeStatement()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getDebtFinOfIncomeStatement()");
+		return debtFins;
+	}
+
+	@Override
+	public List<Tax> getTaxOfIncomeStatement(UUID incomeStatementId) throws ApplicationBusinessException {
+		logger.info("Start of FinancialDaoImpl.getTaxOfIncomeStatement()");
+		List<Tax> tax = null;
+		try {
+			tax = financialRepository.getTax(incomeStatementId);
+		} catch (Exception e) {
+			logger.info("Error in FinancialDaoImpl.getTaxOfIncomeStatement()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+		}
+		logger.info("End of FinancialDaoImpl.getTaxOfIncomeStatement()");
+		return tax;
 	}
 }

@@ -60,8 +60,8 @@ public class FinancialServiceEndPoint {
 		return responseJson;
 	}
 
-	@ApiOperation(value = "Get Financial Data")
-	@PostMapping(value = "/getFinancialData", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Upload Template with Financial Data")
+	@PostMapping(value = "/uploadTemplate", consumes = "application/json", produces = "application/json")
 	@ResponseBody
 	public FinancialServiceResponseJson<FinancialServiceResponseObject> getFinancialData(
 			@RequestBody FinancialServiceRequestJson fRequestJson) {

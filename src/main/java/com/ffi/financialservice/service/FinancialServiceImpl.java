@@ -24,17 +24,23 @@ import com.ffi.financialservice.dao.FinancialDao;
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
 import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.DebtFin;
+import com.ffi.financialservice.domain.DirectCost;
 import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
+import com.ffi.financialservice.domain.IncomeStatement;
+import com.ffi.financialservice.domain.IndirectCost;
 import com.ffi.financialservice.domain.NonCurrentAsset;
 import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
+import com.ffi.financialservice.domain.Revenue;
 import com.ffi.financialservice.domain.Source;
+import com.ffi.financialservice.domain.Tax;
+import com.ffi.financialservice.dto.FinancialDTO;
 import com.ffi.financialservice.endpoint.PeriodRequest;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 import com.ffi.financialservice.handler.AppProperities;
-import com.ffi.financialservice.dto.FinancialDTO;
 
 @Service
 public class FinancialServiceImpl implements FinancialService {
@@ -91,9 +97,9 @@ public class FinancialServiceImpl implements FinancialService {
 			for (PeriodRequest pRequest : periodRequest) {
 				PeriodType periodType = financialDao.getPeriodType(pRequest.getType());
 				Period period = financialDao.getPeriod(periodType.getId(), pRequest.getPeriod());
-				Financial financial = financialDao.getFinancial(source.getId(), period.getId(),
-						UUID.fromString(companyId));
+				Financial financial = financialDao.getFinancial(source.getId(), period.getId(),UUID.fromString(companyId));
 				financialDTOList.addAll(getBalanceSheet(financial.getId(), period.getPeriodValue()));
+				financialDTOList.addAll(getIncomeStatement(financial.getId(), period.getPeriodValue()));
 			}
 			templateURL = uploadDataToTemplate(templateName, financialDTOList);
 		} catch (Exception e) {
@@ -162,6 +168,64 @@ public class FinancialServiceImpl implements FinancialService {
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
 		}
 		logger.info("End of FinancialServiceImpl.getBalanceSheet()");
+		return financialDataList;
+	}
+	
+	private List<FinancialDTO> getIncomeStatement(UUID financialId, String period) throws ApplicationBusinessException {
+		logger.info("Start of FinancialServiceImpl.getIncomeStatement()");
+		List<FinancialDTO> financialDataList = new ArrayList<>();
+		try {
+			IncomeStatement incomeStatement = financialDao.getIncomeStatementOfFinancial(financialId);
+			List<Revenue> revenues = financialDao.getRevenueOfIncomeStatement(incomeStatement.getId());
+			List<DirectCost> directCosts = financialDao.getDirectCostOfIncomeStatement(incomeStatement.getId());
+			List<IndirectCost> indirectCosts = financialDao.getIndirectCostOfIncomeStatement(incomeStatement.getId());
+			List<DebtFin> debtFins = financialDao.getDebtFinOfIncomeStatement(incomeStatement.getId());
+			List<Tax> taxes = financialDao.getTaxOfIncomeStatement(incomeStatement.getId());
+
+			for (Revenue revenue : revenues) {
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(revenue.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(revenue.getValue());
+				financialDataList.add(financialDto);
+			}
+
+			for (DirectCost directCost : directCosts) {
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(directCost.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(directCost.getValue());
+				financialDataList.add(financialDto);
+			}
+
+			for (IndirectCost indirectCost : indirectCosts) {
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(indirectCost.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(indirectCost.getValue());
+				financialDataList.add(financialDto);
+			}
+
+			for (DebtFin debtFin : debtFins) {
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(debtFin.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(debtFin.getValue());
+				financialDataList.add(financialDto);
+			}
+
+			for (Tax tax : taxes) {
+				FinancialDTO financialDto = new FinancialDTO();
+				financialDto.setYear(period);
+				financialDto.setLineItem(tax.getTemplateLabelId().toString());
+				financialDto.setLineItemValue(tax.getValue());
+				financialDataList.add(financialDto);
+			}
+		} catch (ApplicationBusinessException e) {
+			logger.info("Error in FinancialServiceImpl.getIncomeStatement()");
+			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
+		}
+		logger.info("End of FinancialServiceImpl.getBalancegetIncomeStatementSheet()");
 		return financialDataList;
 	}
 

@@ -11,14 +11,19 @@ import org.springframework.stereotype.Repository;
 import com.ffi.financialservice.domain.BalanceSheet;
 import com.ffi.financialservice.domain.CurrentAsset;
 import com.ffi.financialservice.domain.CurrentLiability;
+import com.ffi.financialservice.domain.DebtFin;
+import com.ffi.financialservice.domain.DirectCost;
 import com.ffi.financialservice.domain.Equity;
 import com.ffi.financialservice.domain.Financial;
 import com.ffi.financialservice.domain.IncomeStatement;
+import com.ffi.financialservice.domain.IndirectCost;
 import com.ffi.financialservice.domain.NonCurrentAsset;
 import com.ffi.financialservice.domain.NonCurrentLiability;
 import com.ffi.financialservice.domain.Period;
 import com.ffi.financialservice.domain.PeriodType;
+import com.ffi.financialservice.domain.Revenue;
 import com.ffi.financialservice.domain.Source;
+import com.ffi.financialservice.domain.Tax;
 
 @Repository
 public interface FinancialRepository extends JpaRepository<Financial, Integer>{
@@ -59,5 +64,20 @@ public interface FinancialRepository extends JpaRepository<Financial, Integer>{
 	
 	@Query("select eq from Equity eq INNER JOIN eq.balanceSheet bs where bs.id like :balanceSheetId")
 	List<Equity> getEquity(@Param("balanceSheetId") UUID balanceSheetId);
+	
+	@Query("select r from Revenue r INNER JOIN r.incomeStatement ist where ist.id like :incomeStatementId")
+	List<Revenue> getRevenues(@Param("incomeStatementId") UUID incomeStatementId);
+	
+	@Query("select dc from DirectCost dc INNER JOIN dc.incomeStatement ist where ist.id like :incomeStatementId")
+	List<DirectCost> getDirectCosts(@Param("incomeStatementId") UUID incomeStatementId);
+	
+	@Query("select ic from IndirectCost ic INNER JOIN ic.incomeStatement ist where ist.id like :incomeStatementId")
+	List<IndirectCost> getIndirectCosts(@Param("incomeStatementId") UUID incomeStatementId);
+	
+	@Query("select df from DebtFin df INNER JOIN df.incomeStatement ist where ist.id like :incomeStatementId")
+	List<DebtFin> getDebtFins(@Param("incomeStatementId") UUID incomeStatementId);
+	
+	@Query("select t from Tax t INNER JOIN t.incomeStatement ist where ist.id like :incomeStatementId")
+	List<Tax> getTax(@Param("incomeStatementId") UUID incomeStatementId);
 
 }
