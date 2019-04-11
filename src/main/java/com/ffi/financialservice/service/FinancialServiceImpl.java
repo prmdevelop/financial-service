@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +34,7 @@ import com.ffi.financialservice.domain.Source;
 import com.ffi.financialservice.endpoint.PeriodRequest;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
 import com.ffi.financialservice.handler.AppProperities;
-import com.ffi.financialservice.handler.FinancialDTO;
+import com.ffi.financialservice.dto.FinancialDTO;
 
 @Service
 public class FinancialServiceImpl implements FinancialService {
@@ -87,7 +86,6 @@ public class FinancialServiceImpl implements FinancialService {
 		logger.info("Start of FinancialServiceImpl.getFinancialData()");
 		String templateURL = "";
 		List<FinancialDTO> financialDTOList = new ArrayList<>();
-		Map<String, Map<String, Double>> financialData = new HashMap<>();
 		try {
 			Source source = financialDao.getSource(sourceName);
 			for (PeriodRequest pRequest : periodRequest) {
@@ -97,19 +95,7 @@ public class FinancialServiceImpl implements FinancialService {
 						UUID.fromString(companyId));
 				financialDTOList.addAll(getBalanceSheet(financial.getId(), period.getPeriodValue()));
 			}
-			populateLineItemValueFromTemplate(financialDTOList, templateName);
-			for (int i = 0; i < financialDTOList.size(); i++) {
-				Map<String, Double> lineItemValue;
-				if (financialData.containsKey(financialDTOList.get(i).getLineItem())) {
-					lineItemValue = financialData.get(financialDTOList.get(i).getLineItem());
-					lineItemValue.put(financialDTOList.get(i).getYear(), financialDTOList.get(i).getLineItemValue());
-				} else {
-					lineItemValue = new HashMap<>();
-					lineItemValue.put(financialDTOList.get(i).getYear(), financialDTOList.get(i).getLineItemValue());
-				}
-				financialData.put(financialDTOList.get(i).getLineItem(), lineItemValue);
-			}
-			templateURL = uploadDataToTemplate(templateName, financialData);
+			templateURL = uploadDataToTemplate(templateName, financialDTOList);
 		} catch (Exception e) {
 			logger.info("Error in FinancialServiceImpl.getFinancialData()" + e.getStackTrace());
 			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
@@ -179,52 +165,7 @@ public class FinancialServiceImpl implements FinancialService {
 		return financialDataList;
 	}
 
-	private void populateLineItemValueFromTemplate(List<FinancialDTO> financialDataList, String templateName)
-			throws ApplicationBusinessException {
-		logger.info("Start of FinancialServiceImpl.populateLineItemValueFromTemplate()");
-		try {
-			URL url = new URL(
-					appProperities.getPropertyValue("template.rest.url") + URLEncoder.encode(templateName, "UTF-8"));
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
-			if (conn.getResponseCode() != 200) {
-				throw new ApplicationBusinessException("Failed : HTTP error code : " + conn.getResponseCode());
-			}
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-			StringBuilder sb = new StringBuilder();
-			String inputLine = "";
-			while ((inputLine = br.readLine()) != null) {
-				sb.append(inputLine);
-			}
-			br.close();
-			conn.disconnect();
-			JSONArray jsonArray = new JSONObject(sb.toString()).getJSONObject("data").getJSONObject("templateResponse")
-					.getJSONArray("template");
-			Map<String, String> templateLineItemMap = new HashMap<>();
-			if (jsonArray != null) {
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObject jsonObject = jsonArray.getJSONObject(i);
-					templateLineItemMap.put(jsonObject.getString("templateLabelId"),
-							jsonObject.getString("templateLineItem"));
-				}
-			}
-
-			for (int i = 0; i < financialDataList.size(); i++) {
-				String lineItemId = financialDataList.get(i).getLineItem();
-				if (templateLineItemMap.containsKey(lineItemId)) {
-					financialDataList.get(i).setLineItem(templateLineItemMap.get(lineItemId));
-				}
-			}
-		} catch (Exception e) {
-			logger.info("Error in FinancialServiceImpl.populateLineItemValueFromTemplate()" + e.getStackTrace());
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("error.msg"));
-		}
-		logger.info("End of FinancialServiceImpl.populateLineItemValueFromTemplate()");
-	}
-
-	private String uploadDataToTemplate(String templateName, Map<String, Map<String, Double>> financialData)
+	private String uploadDataToTemplate(String templateName, List<FinancialDTO> financialDTOList)
 			throws ApplicationBusinessException {
 		logger.info("Start of FinancialServiceImpl.uploadDataToTemplate()");
 		String webUrl = "";
@@ -238,7 +179,15 @@ public class FinancialServiceImpl implements FinancialService {
 			conn.setRequestMethod("POST");
 			JSONObject requestJson = new JSONObject();
 			requestJson.put("templateName", templateName);
-			requestJson.put("data", financialData);
+			JSONArray jsonArray = new JSONArray();
+			for (int i = 0; i < financialDTOList.size(); i++) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("year", financialDTOList.get(i).getYear());
+				jsonObject.put("lineItem", financialDTOList.get(i).getLineItem());
+				jsonObject.put("lineItemValue", financialDTOList.get(i).getLineItemValue());
+				jsonArray.put(i, jsonObject);
+			}
+			requestJson.put("data", jsonArray);
 			byte[] data = requestJson.toString().getBytes("UTF-8");
 			OutputStream outStream = conn.getOutputStream();
 			outStream.write(data);
@@ -255,7 +204,8 @@ public class FinancialServiceImpl implements FinancialService {
 			}
 			br.close();
 			conn.disconnect();
-			JSONObject jsonObject = new JSONObject(sb.toString()).getJSONObject("data").getJSONObject("templateResponse");
+			JSONObject jsonObject = new JSONObject(sb.toString()).getJSONObject("data")
+					.getJSONObject("templateResponse");
 			webUrl = jsonObject.getString("url");
 		} catch (Exception e) {
 			logger.info("Error in FinancialServiceImpl.uploadDataToTemplate()" + e.getStackTrace());
