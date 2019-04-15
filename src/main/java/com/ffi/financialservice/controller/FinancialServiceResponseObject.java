@@ -1,4 +1,4 @@
-package com.ffi.financialservice.endpoint;
+package com.ffi.financialservice.controller;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.ffi.financialservice.endpoint;
+package com.ffi.financialservice.controller;
 
 import java.util.HashMap;
 import java.util.List;
