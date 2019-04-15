@@ -1,9 +1,9 @@
 package com.ffi.financialservice.dto;
 
 public class PeriodRequest {
-	
+
 	private String period;
-	
+
 	private String type;
 
 	public String getPeriod() {
@@ -26,7 +26,5 @@ public class PeriodRequest {
 	public String toString() {
 		return "PeriodRequest [period=" + period + ", type=" + type + "]";
 	}
-	
-	
-	
+
 }

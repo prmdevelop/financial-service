@@ -25,7 +25,7 @@ import com.ffi.financialservice.domain.Revenue;
 import com.ffi.financialservice.domain.Source;
 import com.ffi.financialservice.domain.Tax;
 import com.ffi.financialservice.exception.ApplicationBusinessException;
-import com.ffi.financialservice.handler.AppProperities;
+import com.ffi.financialservice.handler.FinancialServiceConfiguration;
 import com.ffi.financialservice.repository.FinancialRepository;
 
 @Component
@@ -37,7 +37,7 @@ public class FinancialDaoImpl implements FinancialDao {
 	FinancialRepository financialRepository;
 
 	@Autowired
-	AppProperities appProperities;
+	FinancialServiceConfiguration configuration;
 
 	@Override
 	public List<Financial> getFinancialOfCustomer(UUID customerId) throws ApplicationBusinessException {
@@ -47,7 +47,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			financials = financialRepository.getFinancialOfCustomer(customerId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getFinancialOfCustomer()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getFinancialOfCustomer()");
 		return financials;
@@ -61,7 +61,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			balanceSheet = financialRepository.getBalanceSheetOfFinancial(financialId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getBalanceSheetOfFinancial()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getBalanceSheetOfFinancial()");
 		return balanceSheet;
@@ -75,7 +75,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			incomeStatement = financialRepository.getIncomeStatementOfFinancial(financialId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getIncomeStatementOfFinancial()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getIncomeStatementOfFinancial()");
 		return incomeStatement;
@@ -89,7 +89,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			periodType = financialRepository.getPeriodType(periodTypeName);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getPeriodType()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getPeriodType()");
 		return periodType;
@@ -103,7 +103,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			period = financialRepository.getPeriod(periodTypeID, periodValue);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getPeriod()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getPeriod()");
 		return period;
@@ -117,7 +117,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			source = financialRepository.getSource(sourceName);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getSource()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getSource()");
 		return source;
@@ -131,7 +131,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			financial = financialRepository.getFinancial(sourceId, periodId,companyId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getFinancial()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getFinancial()");
 		return financial;
@@ -145,7 +145,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			currentAssets = financialRepository.getCurrentAssets(balanceSheetId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getCurrentAssetOfBalanceSheet()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getCurrentAssetOfBalanceSheet()");
 		return currentAssets;
@@ -159,7 +159,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			nonCurrentAssets = financialRepository.getNonCurrentAssets(balanceSheetId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getNonCurrentAssetOfBalanceSheet()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getNonCurrentAssetOfBalanceSheet()");
 		return nonCurrentAssets;
@@ -174,7 +174,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			currentLiability = financialRepository.getCurrentLiability(balanceSheetId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getCurrentLiabilityOfBalanceSheet()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getCurrentLiabilityOfBalanceSheet()");
 		return currentLiability;
@@ -189,7 +189,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			nonCurrentLiability = financialRepository.getNonCurrentLiability(balanceSheetId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getNonCurrentLiabilityOfBalanceSheet()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getNonCurrentLiabilityOfBalanceSheet()");
 		return nonCurrentLiability;
@@ -203,7 +203,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			equity = financialRepository.getEquity(balanceSheetId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getEquityOfBalanceSheet()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getEquityOfBalanceSheet()");
 		return equity;
@@ -217,7 +217,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			revenues = financialRepository.getRevenues(incomeStatementId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getRevenueOfIncomeStatement()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getRevenueOfIncomeStatement()");
 		return revenues;
@@ -231,7 +231,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			directCosts = financialRepository.getDirectCosts(incomeStatementId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getDirectCostOfIncomeStatement()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getDirectCostOfIncomeStatement()");
 		return directCosts;
@@ -246,7 +246,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			indirectCosts = financialRepository.getIndirectCosts(incomeStatementId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getIndirectCostOfIncomeStatement()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getIndirectCostOfIncomeStatement()");
 		return indirectCosts;
@@ -260,7 +260,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			debtFins = financialRepository.getDebtFins(incomeStatementId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getDebtFinOfIncomeStatement()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getDebtFinOfIncomeStatement()");
 		return debtFins;
@@ -274,7 +274,7 @@ public class FinancialDaoImpl implements FinancialDao {
 			tax = financialRepository.getTax(incomeStatementId);
 		} catch (Exception e) {
 			logger.info("Error in FinancialDaoImpl.getTaxOfIncomeStatement()");
-			throw new ApplicationBusinessException(appProperities.getPropertyValue("sql.error"), e.getCause());
+			throw new ApplicationBusinessException(configuration.getError().getRetrieve());
 		}
 		logger.info("End of FinancialDaoImpl.getTaxOfIncomeStatement()");
 		return tax;

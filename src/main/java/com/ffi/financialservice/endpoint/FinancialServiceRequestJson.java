@@ -13,7 +13,7 @@ public class FinancialServiceRequestJson {
 	private String sourceName;
 
 	private List<PeriodRequest> periodRequest;
-
+	
 	public String getTemplateName() {
 		return templateName;
 	}
@@ -45,11 +45,10 @@ public class FinancialServiceRequestJson {
 	public void setPeriodRequest(List<PeriodRequest> periodRequest) {
 		this.periodRequest = periodRequest;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "FinancialServiceRequestJson [templateName=" + templateName + ", companyId=" + companyId + ", sourceName="
-				+ sourceName + ", periodRequest=" + periodRequest + "]";
+		return "FinancialServiceRequestJson [templateName=" + templateName + ", companyId=" + companyId
+				+ ", sourceName=" + sourceName + ", periodRequest=" + periodRequest + "]";
 	}
-
 }

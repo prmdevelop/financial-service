@@ -1,6 +1,6 @@
 package com.ffi.financialservice.vo;
 
-public class FinancialDataVO implements Comparable<FinancialDataVO>{
+public class FinancialVO{
 	
 	private String year;
 	private String lineItem;
@@ -22,10 +22,6 @@ public class FinancialDataVO implements Comparable<FinancialDataVO>{
 	}
 	public void setLineItemValue(Double lineItemValue) {
 		this.lineItemValue = lineItemValue;
-	}
-	@Override
-	public int compareTo(FinancialDataVO o) {
-		return this.getYear().compareTo(o.getYear());
 	}
 	
 	

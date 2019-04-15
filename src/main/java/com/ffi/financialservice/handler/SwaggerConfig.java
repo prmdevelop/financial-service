@@ -16,13 +16,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 	
 	@Autowired
-	AppProperities appProperities;
+	FinancialServiceConfiguration configuration;
 	
 	@Bean
 	public Docket productApi(){
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
-				.apis(RequestHandlerSelectors.basePackage(appProperities.getPropertyValue("swagger.api.path")))
+				.apis(RequestHandlerSelectors.basePackage(configuration.getSwagger()))
 				.paths(PathSelectors.any())
 				.build();
 	}
